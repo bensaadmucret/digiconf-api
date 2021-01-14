@@ -1,6 +1,6 @@
 <?php
 /*
-    Plugin Name: Digiconfs API Get
+    Plugin Name: Digiconfs API Get v2
     Plugin URI: https://fr.linkedin.com/in/mohammed-bensaad-developpeur
 
     Description: Api digiconfs
@@ -11,6 +11,16 @@
 if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+
+  if (!function_exists('wp_insert_post')) {
+      require_once ABSPATH . WPINC . '/post.php';
+  }
+
+  require "vendor/autoload.php";
+  use Jajo\JSONDB;
+
+  $json_db = new JSONDB(__DIR__);
+
 
 function digiconf_api()
 {
@@ -141,6 +151,70 @@ function mzb_register_rest_fields()
 }
 add_action('rest_api_init', 'mzb_register_rest_fields');
 
+
+
+//'https://editionscedille.fr/wp-json/wp/v2/digiconf';
+
+function get_api()
+{
+    $apiUrl = 'https://editionscedille.fr/wp-json/wp/v2/digiconf';
+    $response = wp_remote_get($apiUrl);
+    $responseBody = wp_remote_retrieve_body($response);
+    $result = json_decode($responseBody);
+    return $result;
+}
+
+function insert_digiconf()
+{
+    global $json_db;
+
+    $result =  get_api();
+    
+    if (is_array($result) && ! is_wp_error($result)) {
+        foreach ($result as $key => $value):
+            $titreProduct = $value;
+        echo '<pre>';
+        //var_dump($titreProduct->title->rendered);
+        $id_post = $titreProduct->id;
+        echo '</pre>';
+        $ids = select_digiconf_id();
+        
+        if (empty($ids)):
+            $json_db->insert(
+                'digiconf.json',
+                [
+                    'id'   => $titreProduct->id,
+                    'content'=>$titreProduct->content->rendered,
+                    'title' =>$titreProduct->title->rendered,
+                
+                ]
+            );
+
+        endif;
+       
+      
+        
+
+        endforeach;
+    }
+}
+
+ insert_digiconf();
+
+function select_digiconf_id()
+{
+    global $json_db;
+
+    $digiconfs = $json_db->select('id')
+                ->from('digiconf.json')
+                ->get();
+    return  $digiconfs;
+}
+  
+
+/*************************************
+ *
+ */
 function digiconf_api_categories($object, $field_name, $request)
 {
     $terms_result = array();
@@ -176,13 +250,13 @@ function digiconf_api_image($object, $field_name, $request)
 
 function mzb_styles_scripts()
 {
-    wp_enqueue_style('tuts', plugins_url('/css/tuts.css', __FILE__));
-    wp_register_script('tuts', plugins_url('/js/tuts.js', __FILE__), array('jquery'), '', true);
+    wp_enqueue_style('tuts', plugins_url('/css/digiconf.css', __FILE__));
+    wp_register_script('tuts', plugins_url('/js/digiconf.js', __FILE__), array('jquery'), '', true);
 
     wp_localize_script(
         'tuts',
         'tuts_opt',
-        array('jsonUrl' => rest_url('wp/v2/digiconf'))
+        array('jsonUrl' => rest_url('acf/v3/digiconf'))
     );
 }
 add_action('wp_enqueue_scripts', 'mzb_styles_scripts');
@@ -272,21 +346,23 @@ function digiconf_api_shortcode_callback($atts, $content = null)
             $output .= '</div>';
         }
 
-        $output .= '<ul class="'.implode(' ', $class).'">';
+        $output .= '<div class="'.implode(' ', $class).'">';
         while ($tuts->have_posts()) {
             $tuts->the_post();
 
             $IMAGE = wp_get_attachment_image_src(get_post_thumbnail_id(get_the_ID()), 'full', false);
 
-            $output .= '<li>';
+            $output .= '<div class="container-digiconf">';
 
             $output .= '<img src="'.esc_url($IMAGE[0]).'" alt="'.esc_attr(get_the_title()).'" />';
 
-            $output .='<div class="digiconf-content">';
+           
 
-            $output .='<div class="digiconf-category">';
-            $output .= get_the_term_list(get_the_ID(), 'digiconf-category', '', ', ', '');
+            $output .=' <div class="card-top" id="company-top">';
+            $output .= '<h3>' . get_the_term_list(get_the_ID(), 'digiconf-category', '', ', ', '').  '</h3> ';
             $output .='</div>';
+
+            $output .='<div class="card-content">';
 
             if ('' != get_the_title()) {
                 $output .='<h4 class="digiconf-title entry-title">';
@@ -308,14 +384,16 @@ function digiconf_api_shortcode_callback($atts, $content = null)
 
             $output .='</div>';
 
-            $output .= '</li>';
+            $output .= '</div>';
         }
         wp_reset_postdata();
-        $output .= '</ul>';
-
         $output .= '</div>';
+        
+        $output .= '</div>';
+
+   
 
         return $output;
     }
 }
-add_shortcode('tuts', 'digiconf_api_shortcode_callback');
+add_shortcode('digiconf', 'digiconf_api_shortcode_callback');

@@ -1,0 +1,5 @@
+{
+    "require": {
+        "jajo/jsondb": "^2.1"
+    }
+}
