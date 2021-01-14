@@ -1,6 +1,10 @@
 # ignore everything in the root except the "wp-content" directory.
 !wp-content/
-!vendor/
+/node_modules
+/public/storage
+/storage/*.key
+/vendor
+/.idea
 
 # ignore everything in the "wp-content" directory, except:
 # "mu-plugins", "plugins", "themes" directory
