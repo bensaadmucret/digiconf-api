@@ -8,156 +8,136 @@
     Version: 1.0
     Author URI: https://fr.linkedin.com/in/mohammed-bensaad-developpeur
 */
+
 if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+
+// Define Our Constants
+define('DIGICONF_CORE_INC', dirname(__FILE__).'/assets/inc/');
+define('DIGICONF_CORE_IMG', plugins_url('assets/img/', __FILE__));
+define('DIGICONF_CORE_CSS', plugins_url('assets/css/', __FILE__));
+define('DIGICONF_CORE_JS', plugins_url('assets/js/', __FILE__));
+/*
+*
+*  Register CSS
+*
+*/
+function digiconf_register_core_css()
+{
+    wp_enqueue_style('digiconf-core', DIGICONF_CORE_CSS . 'digiconf.css', null, time(), 'all');
+};
+add_action('wp_enqueue_scripts', 'digiconf_register_core_css');
+/*
+*
+*  Register JS/Jquery Ready
+*
+*/
+function digiconf_register_core_js()
+{
+    // Register Core Plugin JS
+    wp_enqueue_script('digiconf-core', DIGICONF_CORE_JS . 'digiconf.js', 'jquery', time(), true);
+};
+add_action('wp_enqueue_scripts', 'digiconf_register_core_js');
+
 
   if (!function_exists('wp_insert_post')) {
       require_once ABSPATH . WPINC . '/post.php';
   }
 
-  require "vendor/autoload.php";
-  use Jajo\JSONDB;
+ require_once __DIR__ . '/vendor/autoload.php';
+  //use Jajo\JSONDB;
+use App\Manager;
 
-  $json_db = new JSONDB(__DIR__);
+$manager = new Manager();
+
+$result = $manager->get_api();
+
+if (is_array($result) && ! is_wp_error($result)) {
+    foreach ($result as $key => $value):
+        $data[] = $value;
+    endforeach;
+    $ids = $manager->select_all_by_id();
+    if (empty($ids)):
+
+            $manager->insert_all($data);
+
+    endif;
+    if (!empty($ids)):
+
+            $manager->update_all($data);
+
+    endif;
 
 
-
-
-
-
-
-//'https://editionscedille.fr/wp-json/wp/v2/digiconf';
-//https://dev.editionscedille.fr/wp-json/wp/v2/digiconf
-
-
-function get_api()
-{
-    $apiUrl = 'https://dev.editionscedille.fr/wp-json/wp/v2/digiconf';
-    $response = wp_remote_get($apiUrl);
-    $responseBody = wp_remote_retrieve_body($response);
-    $result = json_decode($responseBody);
-    return $result;
-}
-
-function insert_digiconf()
-{
-    global $json_db;
-    $result =  get_api();
-    if (is_array($result) && ! is_wp_error($result)) {
-        foreach ($result as $key => $value):
-            $titreProduct[] = $value;
-        echo '<pre>';
-        //var_dump($titreProduct[0]->acf->event_date_time);
-        echo '</pre>';
-        endforeach;
-        //print_r(array_values($id_post));
-        
-
-       
-       
-        $ids = select_digiconf_id_all();
-        if (empty($ids)):
-        for ($i= 0; $i < count($titreProduct); $i++):
-        $json_db->insert(
-            'digiconf.json',
-            [
-                'id' =>  $titreProduct[$i]->id,
-                'title' => $titreProduct[$i]->title->rendered,
-                'content' => $titreProduct[$i]->content->rendered,
-                'event_date_time'=>$titreProduct[$i]->acf->event_date_time,
-                'heures'=>$titreProduct[$i]->acf->heures,
-                'url' =>$titreProduct[$i]->acf->url
-            ]
-        );
-        
-        endfor;
-        endif;
-        if (!empty($ids)):
-        for ($i= 0; $i < count($titreProduct); $i++):
-            $json_db->update(
-                [
-                 'id' =>  $titreProduct[$i]->id,
-                'title' => $titreProduct[$i]->title->rendered,
-                'content' => $titreProduct[$i]->content->rendered,
-                'event_date_time'=>$titreProduct[$i]->acf->event_date_time,
-                'heures'=>$titreProduct[$i]->acf->heures,
-                'url' =>$titreProduct[$i]->acf->url
-                ]
-            )
-            ->from('digiconf.json')
-            ->where([ 'id' => $titreProduct[$i]->id ])
-            ->trigger();
-        
-        endfor;
-        endif;
-    }
-}
-
- insert_digiconf();
-
-function select_digiconf_id_all()
-{
-    global $json_db;
-
-    $digiconfs = $json_db->select('id')
-                ->from('digiconf.json')
-                ->get();
-    return  $digiconfs;
-}
-  
-function order_by_date()
-{
-    global $json_db,  $titreProduct;
-    $apiUrl = 'https://dev.editionscedille.fr/wp-json/wp/v2/digiconf';
-    $response = wp_remote_get($apiUrl);
-    $responseBody = wp_remote_retrieve_body($response);
-    $result = json_decode($responseBody);
-    for ($i= 0; $i < count($result); $i++):
-    $myPost = $json_db->select('*')
-    ->from('digiconf.json')
-    ->order_by('event_date_time', JSONDB::ASC)
-    ->get();
-    endfor;
-    return $myPost;
 }
 
 
+/**
+ * template | shortcode : digiconf
+ *
+ * @return html
+ *
+ */
+ 
 
 function digiconf_api_shortcode_callback()
 {
-    $data = order_by_date();
-    // var_dump($data);
-    
-    // var_dump($post);
-   
-    ob_start();
-    foreach ($data as $post):
-        //var_dump($post);?>
-    <div class="container-digiconf">
-  <!--Card begin-->
-    <div class="card">
-        <!--Top row-->
-        <div class="card-top" id="company-top">
-        <h3><?php echo $post["title"]; ?></h3>     
-        </div>
-        <!--Content-->
-        <div class="card-content">      
-        <h4><?php echo $post["title"]; ?></h4> 
-        <p><?php echo $post["content"]; ?></p>
-        <span><?php echo $post["event_date_time"]; ?></span>
-        <span><?php echo $post["heures"]; ?></span>
-         <span><?php echo $post["url"]; ?></span>
+    global $manager;
+    $data = $manager->order_by_date();
+  // var_dump($data);
+    ob_start(); ?>
+
+
+<div style="text-align:center;margin-top:25px;font-weight:bold;texxxt-decoration:none;"></div>
+<div class="muck-up">
+  <div class="overlay"></div>
+  <div class="top">
+    <div class="nav"></div>
+    <div class="user-profile">
+
+      <div class="user-details">
+        <h4>DIGI'CONFS by Cédille</h4>
+          <hr style="border-style: none;
+            border-bottom: var(--separator--height) solid #f1f1f1;
+            clear: both;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 30%;">
+        <p>NOS PROCHAINES DATES</p>
       </div>
-      <!--bottom-->
-      <div class="card-bottom"> 
-       
-      </div>
-     </div>
-     <!--Card end-->
     </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="bottom">
+    <div class="title">
+      <h3></h3>
+      <small></small>
+    </div>
+    <ul class="tasks">
+    <?php foreach ($data as $post): ?>
+      <li class="one red">
+          <div class="user-profile ">
+              <img  src="<?php echo $post["image"]; ?>">
+              <span class="task-theme"><?php echo $post["theme"]; ?>
+              <?php echo $post["societe"]; ?></span>
+          </div>
+        <span class="task-title"><?php echo $post["title"]; ?></span>
+          <span class="task-cat"><a class="myButton" href="<?php echo $post["url"]; ?>"> Je m'inscris !</a> </span>
+        <span class="task-cat"><?php echo $post["event_date_time"]; ?></span>
+          <span class="task-cat"><?php echo $post["heures"]; ?></span>
+      </li>
+        <div class="clearfix"></div>
+    <?php  endforeach; ?>
+    </ul>
+  </div>
+</div>
+
+
    <?php
-    endforeach;
+
     $html = ob_get_contents();
     ob_end_clean();
     return $html;

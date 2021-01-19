@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '7361fb701538c2397f26af8b6993a8a407cff0f0',
+    'reference' => 'f719b0a3b4d1a24d60286b37368244c2c4c20dcd',
     'name' => '__root__',
   ),
   'versions' => 
@@ -31,7 +31,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '7361fb701538c2397f26af8b6993a8a407cff0f0',
+      'reference' => 'f719b0a3b4d1a24d60286b37368244c2c4c20dcd',
     ),
     'jajo/jsondb' => 
     array (

@@ -15,12 +15,20 @@ class ComposerStaticInit0efd496c3e367d906de9f03cc47d90b8
         array (
             'Jajo\\' => 5,
         ),
+        'A' => 
+        array (
+            'App\\' => 4,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'Jajo\\' => 
         array (
             0 => __DIR__ . '/..' . '/jajo/jsondb/src',
+        ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/App',
         ),
     );
 

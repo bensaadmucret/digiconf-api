@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Jajo\\' => array($vendorDir . '/jajo/jsondb/src'),
+    'App\\' => array($baseDir . '/App'),
 );
