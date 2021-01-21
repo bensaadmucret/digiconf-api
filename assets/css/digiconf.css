@@ -6,6 +6,11 @@
   box-sizing: border-box;
 }
 
+.url {
+  outline: none;
+  text-decoration: none;
+  padding: 2px 1px 0;
+}
 .clearfix:after,
 .clearfix:before {
   content: "";
@@ -18,19 +23,17 @@
 }
 
 .muck-up {
-  width: 310px;
-  height: 545px;
-  margin: 5em auto;
+  width: 385px;
+  height: 585px;
+  /* margin: 5em auto;*/
   position: relative;
   overflow-y: scroll;
   overflow-x: hidden;
-
-
 }
 
 .overlay {
   background: url(https://editionscedille.fr/wp-content/uploads/2020/12/Digiconfs_Fond_Dégradé.jpg)
-  no-repeat top / contain;
+    no-repeat top / contain;
   position: absolute;
   left: 0;
   top: 0;
@@ -57,10 +60,16 @@
   background-size: cover;
 }
 
-
 .top .nav span {
   float: left;
   display: block;
+}
+
+.center img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
 }
 
 .nav p {
@@ -81,25 +90,25 @@
 }
 
 .user-profile {
-  margin: 19px;
-  display: flex;
-  flex-direction: column;
+  margin: 9px;
 }
 
 .user-profile img {
   height: 45px;
   width: 45px;
-  border-radius: 50%;
+  border-radius: 50% !important;
   float: left;
   margin-right: 24px;
 }
 
 .user-details p {
   font-size: 11px;
-
 }
 
-
+.baseligne {
+  text-shadow: 1px 1px 2px black;
+  font-size: 18px !important;
+}
 
 .user-details {
   align-items: center;
@@ -110,6 +119,10 @@
 
 .user-details h4 {
   font-size: 18px;
+}
+
+.user-details > h4 {
+  color: #fff;
 }
 
 .filter-btn {
@@ -197,7 +210,7 @@ span.toggle-btn.ion-android-funnel:hover {
 
 .muck-up .bottom {
   background-color: #fff;
-  min-height: 303px;
+  min-height: 60%;
   z-index: 1;
   padding: 5px;
   position: relative;
@@ -214,7 +227,7 @@ span.toggle-btn.ion-android-funnel:hover {
   right: 0;
   height: 100px;
   transform: rotate(10deg);
-  width: 337px;
+  width: 389px;
   z-index: -1;
 }
 
@@ -227,8 +240,10 @@ span.toggle-btn.ion-android-funnel:hover {
   margin-bottom: 5px;
 }
 
-.myButton{
-  color: #eeeeee;
+.societe {
+  color: #000;
+  font-weight: 900;
+  font-size: 10px;
 }
 .title small {
   font-size: 10px;
@@ -239,15 +254,17 @@ span.toggle-btn.ion-android-funnel:hover {
 
 ul.tasks {
   list-style-type: none !important;
+  padding: 0px;
+  padding-left: 3%;
 }
 
-.task-theme{
+.task-theme {
   font-size: 10px;
   font-weight: 900;
-  }
+}
 
 ul.tasks .task-title {
-  font-size: 13px;
+  font-size: 10px;
   display: flex;
   list-style-type: none;
 }
@@ -260,18 +277,10 @@ ul.tasks .task-time {
 
 ul.tasks .task-cat {
   font-size: 10px;
-  display: block;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  width: 30%;
-  text-align: center;
-  justify-content: center;
-  align-content: baseline;
-  background-color: #ca2186;
-  padding: .5%;
-  margin: 1%;
-  float: right;
+  color: #555;
+  font-weight: 900;
+  display: flex;
+  padding-left: 30%;
 }
 
 ul.tasks li {
@@ -290,10 +299,6 @@ ul.tasks li:after {
   border-radius: 50%;
 }
 
-ul.tasks li.red:after {
-  background: #ff3163;
-}
-
 ul.tasks li.green:after {
   background: #54d6c7;
 }
@@ -301,7 +306,6 @@ ul.tasks li.green:after {
 ul.tasks li.yellow:after {
   background: #eab429;
 }
-
 
 ul.tasks::after {
   content: "";

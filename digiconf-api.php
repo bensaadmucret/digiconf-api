@@ -68,8 +68,18 @@ if (is_array($result) && ! is_wp_error($result)) {
             $manager->update_all($data);
 
     endif;
+}
 
 
+function subMyString($contenu, $limite, $separateur = '...')
+{
+    if (strlen($contenu) >= $limite) {
+        $contenu = substr($contenu, 0, $limite);
+        $contenu = substr($contenu, 0, strrpos($contenu, ' '));
+        $contenu .= $separateur;
+    }
+
+    return $contenu;
 }
 
 
@@ -85,7 +95,7 @@ function digiconf_api_shortcode_callback()
 {
     global $manager;
     $data = $manager->order_by_date();
-  // var_dump($data);
+    // var_dump($data);
     ob_start(); ?>
 
 
@@ -94,40 +104,40 @@ function digiconf_api_shortcode_callback()
   <div class="overlay"></div>
   <div class="top">
     <div class="nav"></div>
+    <div class="center">
+     <img src="https://editionscedille.fr/wp-content/uploads/2021/01/Digiconfs_Tuile_Logo_transparent.png"  width="70%" height="50%" >
+    </div>
+     
     <div class="user-profile">
 
       <div class="user-details">
-        <h4>DIGI'CONFS by Cédille</h4>
           <hr style="border-style: none;
             border-bottom: var(--separator--height) solid #f1f1f1;
             clear: both;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin-top: 1px;
+            margin-bottom: 1px;
             margin-left: auto;
             margin-right: auto;
             width: 30%;">
-        <p>NOS PROCHAINES DATES</p>
+        <p class="baseligne">NOS PROCHAINES DATES</p>
       </div>
     </div>
   </div>
   <div class="clearfix"></div>
   <div class="bottom">
-    <div class="title">
-      <h3></h3>
-      <small></small>
-    </div>
     <ul class="tasks">
     <?php foreach ($data as $post): ?>
       <li class="one red">
           <div class="user-profile ">
               <img  src="<?php echo $post["image"]; ?>">
-              <span class="task-theme"><?php echo $post["theme"]; ?>
-              <?php echo $post["societe"]; ?></span>
           </div>
-        <span class="task-title"><?php echo $post["title"]; ?></span>
-          <span class="task-cat"><a class="myButton" href="<?php echo $post["url"]; ?>"> Je m'inscris !</a> </span>
-        <span class="task-cat"><?php echo $post["event_date_time"]; ?></span>
-          <span class="task-cat"><?php echo $post["heures"]; ?></span>
+          <a class="url" href="<?php echo $post["url"]; ?>">
+          <span class="task-theme"><?php echo $post["theme"]; ?></span>
+          <span class="societe"><?php echo $post["societe"]; ?></span>
+          <span class="task-title"><?php echo subMyString($post["title"], 35); ?></span>
+        <span class="task-cat"><?php echo $post["event_date_time"]; ?> <?php echo $post["heures"]; ?></span>
+          <span class="task-cat"></span>
+          </a>
       </li>
         <div class="clearfix"></div>
     <?php  endforeach; ?>
